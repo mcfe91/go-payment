@@ -35,7 +35,7 @@ CREATE TABLE `transaction` (
     src_account_type VARCHAR(255) NOT NULL,
     dst_account_type VARCHAR(255) NOT NULL,
     final_dst_merchant_wallet_id INT,
-    amout INT NOT NULL,
+    amount INT NOT NULL,
     INDEX(pid)
 );
 
