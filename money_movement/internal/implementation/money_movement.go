@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/mmcferren/go-micro/internal/producer"
 	pb "github.com/mmcferren/go-micro/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/internal/status"
@@ -39,54 +40,54 @@ func (this *Implementation) Authorize(ctx context.Context, authorizePayload *pb.
 
 	merchantWallet, err := fetchWallet(tx, authorizePayload.MerchantWalletUserId)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	customerWallet, err := fetchWallet(tx, authorizePayload.CustomerWalletUserId)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	srcAccount, err := fetchAccount(tx, customerWallet.ID, "DEFAULT")
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	dstAccount, err := fetchAccount(tx, customerWallet.ID, "PAYMENT")
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	err = transfer(tx, srcAccount, dstAccount, authorizePayload.Cents)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	pid, err := createTransaction(tx, srcAccount, dstAccount, merchantWallet, authorizePayload.Cents)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
@@ -109,54 +110,54 @@ func (this *Implementation) Capture(ctx context.Context, capturePayload *pb.Capt
 
 	authorizeTransaction, err := fetchTransaction(tx, capturePayload.Pid)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	srcAccount, err := fetchAccount(tx, authorizeTransaction.dstAccountWalletID, "PAYMENT")
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 	
 	dstMerchantAccount, err := fetchAccount(tx, authorizeTransaction.finalDstMerchantWalletID, "INCOMING")
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	err = transfer(tx, srcAccount, dstMerchantAccount, authorizeTransaction.amount)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	merchantWallet, err := fetchWallet(tx, authorizeTransaction.dstUserID)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
 
 	_, err = createTransaction(tx, srcAccount, dstMerchantAccount, merchantWallet, authorizeTransaction.amount)
 	if err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return nil, status.Error(codes.Internal, rollbackErr.Error())
 		}
 		return nil, err
 	}
@@ -168,7 +169,7 @@ func (this *Implementation) Capture(ctx context.Context, capturePayload *pb.Capt
 	}
 
 	// Publish
-	// producer.SendCaptureMessage(authorizeTransaction.pid, authorizeTransaction.srcUserID, authorizeTransaction.amount)
+	producer.SendCaptureMessage(authorizeTransaction.pid, authorizeTransaction.srcUserID, authorizeTransaction.amount)
 
 	return &emptypb.Empty{}, nil
 }
