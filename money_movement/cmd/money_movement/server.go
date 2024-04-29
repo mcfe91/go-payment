@@ -7,6 +7,7 @@ import (
 	"net"
 
 	// "github.com/mmcferren/go-micro/internal/implementation/auth"
+	mm "github.com/mmcferren/go-micro/internal/implementation"
 	pb "github.com/mmcferren/go-micro/proto"
 	"google.golang.org/grpc"
 )
@@ -44,17 +45,17 @@ func main() {
 	}
 
 	// gRPC server setup
-	// grpcServer := grpc.NewServer()
-	// pb.RegisterMoneyMovementServiceServer(grpcServer,)
+	grpcServer := grpc.NewServer()
+	pb.RegisterMoneyMovementServiceServer(grpcServer, mm.NewMoneyMovementImplementation(db))
 
 	// // Listen and serve
-	// listener, err := net.Listen("tcp", ":9000")
-	// if err != nil {
-	// 	log.Fatalf("failed to listen on port 9000: %v", err)
-	// }
+	listener, err := net.Listen("tcp", ":7000")
+	if err != nil {
+		log.Fatalf("failed to listen on port 9000: %v", err)
+	}
 
-	// log.Printf("server listening at %v", listener.Addr())	
-	// if err := grpcServer.Serve(listener); err != nil {
-	// 	log.Fatalf("failed to serve: %v", err)
-	// }
+	log.Printf("server listening at %v", listener.Addr())	
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
