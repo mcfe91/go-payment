@@ -97,6 +97,9 @@ func validateJWT(t string, signingKey []byte) (string, error) {
 		return signingKey, nil
 	})
 	if err != nil {
+		log.Println(err)
+		log.Println(parsedToken)
+		
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return "", status.Error(codes.Unauthenticated, "token expired")
 		} else {

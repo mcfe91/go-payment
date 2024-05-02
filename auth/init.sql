@@ -12,4 +12,4 @@ CREATE TABLE `user` (
     password VARCHAR(255) NOT NULL
 );
 
-INSERT INTO user (user_id, password) VALUES ('mmcferren91@gmail.com', 'Admin123');
+INSERT INTO user (user_id, password) VALUES ('maztest8911@gmail.com', 'Admin123');

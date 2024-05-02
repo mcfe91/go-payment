@@ -32,7 +32,7 @@ func main() {
 
 	authClient = authpb.NewAuthServiceClient(authConn)
 	
-	mmConn, err := grpc.Dial("money_movement:7000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	mmConn, err := grpc.Dial("money-movement:7000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,12 +89,12 @@ func customerPaymentAuthorize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !strings.HasPrefix(authHeader, "Bearer") {
+	if !strings.HasPrefix(authHeader, "Bearer ") {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
-	token := strings.TrimPrefix(authHeader, "Bearer")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
 
 	ctx := context.Background()
 	_, err := authClient.ValidateToken(ctx, &authpb.Token{Jwt: token})

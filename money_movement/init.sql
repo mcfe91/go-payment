@@ -38,7 +38,7 @@ CREATE TABLE `transaction` (
 );
 
 -- merchant and customer wallets
-INSERT INTO wallet (id, user_id, wallet_type) VALUES (1, 'mm@gmail.com', 'CUSTOMER');
+INSERT INTO wallet (id, user_id, wallet_type) VALUES (1, 'maztest8911@gmail.com', 'CUSTOMER');
 INSERT INTO wallet (id, user_id, wallet_type) VALUES (2, 'merchant_id', 'MERCHANT');
 
 -- customer accounts
