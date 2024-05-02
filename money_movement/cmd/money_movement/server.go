@@ -16,6 +16,7 @@ import (
 const (
 	dbDriver = "mysql"
 	dbUser = "money_movement_user"
+	// TODO: use k8s secrets
 	dbPassword = "Auth123"
 	dbName = "money_movement"
 )
