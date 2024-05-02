@@ -1,5 +1,9 @@
-# Add kafka quick start
+# minikube
+# minikube start --memory=4096  
+# minikube mount /Users/maxmcferren/go/src/go-micro:/go-micro
+# minikube tunnel
 
+# Add kafka quick start
 # kubectl create namespace kafka
 # kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 # kubectl get pod -n kafka --watch
@@ -14,3 +18,7 @@
 # minikube addons enable ingress
 # kubectl get pods -n ingress-nginx
 # (ingress yaml is in api_gateway/)
+
+# access mysql database
+# kubectl port-forward -n kafka mysql-money-movement-7597c855cc-s2psx 3306:3306
+# mysql -u root -h 127.0.0.1 -p (make sure local mysql service is stopped)
