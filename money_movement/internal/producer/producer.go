@@ -32,8 +32,11 @@ func SendCaptureMessage(pid string, userID string, amount int64) {
 	sarama.Logger = log.New(os.Stdout, "[sarama]", log.LstdFlags)
 	
 	// Create a sync producer
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+
 	// TODO: decouple this dependency
-	producer, err := sarama.NewSyncProducer([]string{"kafka-service:9092"}, sarama.NewConfig())
+	producer, err := sarama.NewSyncProducer([]string{"kafka-service:9092"}, config)
 	if err != nil {
 		log.Println(err)
 		return
