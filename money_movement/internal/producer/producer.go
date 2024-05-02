@@ -33,7 +33,7 @@ func SendCaptureMessage(pid string, userID string, amount int64) {
 	
 	// Create a sync producer
 	// TODO: decouple this dependency
-	producer, err := sarama.NewSyncProducer([]string{"my-cluster-kafka-bootstrap:9092"}, sarama.NewConfig())
+	producer, err := sarama.NewSyncProducer([]string{"kafka-service:9092"}, sarama.NewConfig())
 	if err != nil {
 		log.Println(err)
 		return

@@ -57,6 +57,7 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
+	// TODO: Don't store plain text pws!
 	username, password, ok := r.BasicAuth()
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
