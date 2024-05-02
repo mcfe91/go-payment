@@ -166,12 +166,12 @@ func customerPaymentCapture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !strings.HasPrefix(authHeader, "Bearer") {
+	if !strings.HasPrefix(authHeader, "Bearer ") {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
-	token := strings.TrimPrefix(authHeader, "Bearer")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
 
 	ctx := context.Background()
 	_, err := authClient.ValidateToken(ctx, &authpb.Token{Jwt: token})
