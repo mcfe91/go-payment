@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/IBM/sarama"
 	"github.com/mmcferren/go-micro/internal/ledger"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
 	dbDriver = "mysql"
-	dbUser = "root"
-	dbPassword = "Admin123"
 	dbName = "ledger"
 	topic = "ledger"
 )
@@ -35,8 +35,11 @@ type LedgerMsg struct {
 func main() {
 	var err error
 
+	dbUser := os.Getenv("MYSQL_USERNAME")
+	dbPassword := os.Getenv("MYSQL_PASSWORD")
+
 	// Open a database connection
-	dsn := fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", dbUser, dbPassword, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(mysql-ledger:3306)/%s", dbUser, dbPassword, dbName)
 	
 	db, err = sql.Open(dbDriver, dsn)
 	if err != nil {
@@ -56,8 +59,10 @@ func main() {
 	}
 
 	done := make(chan struct{})
+	
+	sarama.Logger = log.New(os.Stdout, "[sarama]", log.LstdFlags)
 
-	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, sarama.NewConfig())
+	consumer, err := sarama.NewConsumer([]string{"kafka-service:9092"}, sarama.NewConfig())
 	if err != nil {
 		log.Fatal(err)
 	}

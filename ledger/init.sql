@@ -2,7 +2,7 @@ CREATE USER 'ledger_user'@'%' IDENTIFIED BY 'Auth123';
 
 CREATE DATABASE ledger;
 
-GRANT ALL PRIVILEGES ON ledge.* TO 'ledger_user'@'%';
+GRANT ALL PRIVILEGES ON ledger.* TO 'ledger_user'@'%';
 
 USE ledger;
 
