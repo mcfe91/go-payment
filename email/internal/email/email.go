@@ -3,12 +3,12 @@ package email
 import (
 	"fmt"
 	"net/smtp"
+	"os"
 )
 
 func Send(target string, orderID string) error {
-	// TODO: remove test credentials
-	senderEmail := "email@gmail.com"
-	password := "password"
+	senderEmail := os.Getenv("SENDER_EMAIL")
+	password := os.Getenv("SENDER_PASSWORD")
 
 	recipientEmail := target
 
