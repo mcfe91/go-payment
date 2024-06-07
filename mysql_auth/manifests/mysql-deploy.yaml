@@ -37,13 +37,3 @@ spec:
       - name: mysql-auth-initdb
         configMap:
           name: mysql-auth-initdb-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql-auth
-spec:
-  ports:
-  - port: 3306
-  selector:
-    app: mysql-auth
