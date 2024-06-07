@@ -2,39 +2,48 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-auth
-  labels:
-    app: mysql-auth
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mysql-auth
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+    type: Recreate
   template:
     metadata:
       labels:
         app: mysql-auth
     spec:
       containers:
-        - name: mysql-auth
-          image: mysql:latest
-          envFrom:
-            - configMapRef:
-                name: mysql-auth-configmap
-            - secretRef:
-                name: mysql-auth-secret
-          volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d/init.sql
-              name: init-sql
-              readOnly: true
-          securityContext:
-            privileged: true
+      - image: mysql:latest
+        name: mysql-auth
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-auth-secret
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql-auth
+        volumeMounts:
+        - name: mysql-auth-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-auth-initdb
+          mountPath: /docker-entrypoint-initdb.d/init.sql
       volumes:
-        - name: init-sql
-          hostPath:
-            path: /go-micro/auth/init.sql
-            type: File
+      - name: mysql-auth-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-auth-pv-claim
+      - name: mysql-auth-initdb
+        configMap:
+          name: mysql-auth-initdb-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-auth
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql-auth
