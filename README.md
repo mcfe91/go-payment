@@ -1,4 +1,5 @@
 # TODO:
+- ~~Update manifests - initdb in configmap for GKE / remove unneeded PV.~~
 - Move infra to separate repo
 - Move credentials to secrets provider
 - Add Redis caching
