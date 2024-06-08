@@ -3,38 +3,43 @@ kind: Deployment
 metadata:
   name: mysql-money-movement
   labels:
-    app: mysql-money-movement
+    name: mysql-money-movement
+    app: payments
+  namespace: development
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysql-money-movement
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+      name: mysql-money-movement-pod
+      app: payments
   template:
     metadata:
+      name: mysql-money-movement-pod
       labels:
-        app: mysql-money-movement
+        name: mysql-money-movement-pod
+        app: payments
     spec:
       containers:
         - name: mysql-money-movement
-          image: mysql:latest
-          envFrom:
-            - configMapRef:
-                name: mysql-money-movement-configmap
-            - secretRef:
-                name: mysql-money-movement-secret
+          image: mysql:8.0.32
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-money-movement-secret
+                  key: root-password
           volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d/init.sql
-              name: init-sql
-              readOnly: true
-          securityContext:
-            privileged: true
+            - name: mysql-money-movement-initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mysql-money-movement-data
+              mountPath: "/var/lib/mysql"
+              subPath: "mysql"
       volumes:
-        - name: init-sql
-          hostPath:
-            path: /go-micro/money_movement/init.sql
-            type: File
+        - name: mysql-money-movement-initdb
+          configMap:
+            name: mysql-money-movement-preload-data-config
+        - name: mysql-money-movement-data
+          persistentVolumeClaim:
+            claimName: mysql-money-movement-data-store

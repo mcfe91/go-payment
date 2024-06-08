@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-auth-data-store
+  name: mysql-ledger-data-store
   labels:
-    name: mysql-auth-data-store
+    name: mysql-ledger-data-store
     app: payments
   namespace: development
 spec:

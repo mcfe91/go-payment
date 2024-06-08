@@ -2,38 +2,44 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-auth
+  labels:
+    name: mysql-auth
+    app: payments
+  namespace: development
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: mysql-auth
-  strategy:
-    type: Recreate
+      name: mysql-auth-pod
+      app: payments
   template:
     metadata:
+      name: mysql-auth-pod
       labels:
-        app: mysql-auth
+        name: mysql-auth-pod
+        app: payments
     spec:
       containers:
-      - image: mysql:latest
-        name: mysql-auth
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-auth-secret
-              key: password
-        ports:
-        - containerPort: 3306
-          name: mysql-auth
-        volumeMounts:
-        - name: mysql-auth-persistent-storage
-          mountPath: /var/lib/mysql
-        - name: mysql-auth-initdb
-          mountPath: /docker-entrypoint-initdb.d/init.sql
+        - name: mysql-auth
+          image: mysql:8.0.32
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-auth-secret
+                  key: root-password
+          volumeMounts:
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mysql-data
+              mountPath: "/var/lib/mysql"
+              subPath: "mysql"
       volumes:
-      - name: mysql-auth-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-auth-pv-claim
-      - name: mysql-auth-initdb
-        configMap:
-          name: mysql-auth-initdb-config
+        - name: mysql-initdb
+          configMap:
+            name: mysql-auth-preload-data-config
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-auth-data-store

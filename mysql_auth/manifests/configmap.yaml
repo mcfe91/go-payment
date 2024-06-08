@@ -1,17 +1,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-auth-initdb-config
+  name: mysql-auth-preload-data-config
+  labels:
+    name: mysql-auth-data-store
+    app: payments
+  namespace: development
 data:
   init.sql: |
-    CREATE DATABASE auth;
-
-    USE auth;
-
-    CREATE TABLE user (
-        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        user_id VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL
+    CREATE DATABASE IF NOT EXISTS`auth`;
+    USE `auth`;
+    DROP TABLE IF EXISTS `user`;
+    CREATE TABLE `user`(
+     `id`int NOT NULL AUTO_INCREMENT,
+     `user_id`varchar(255) NOT NULL UNIQUE,
+     `password`varchar(255) NOT NULL,
+      PRIMARY KEY (`id`)
     );
-
-    INSERT INTO user (user_id, password) VALUES ('maztest8911@gmail.com', 'Admin123');
+    insert into user(`user_id`,`password`) values('maztest8911@gmail.com','winter');`

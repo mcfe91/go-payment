@@ -1,9 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-auth
+  name: mysql-auth-service
+  labels:
+    name: mysql-auth-service
+    app: payments
+  namespace: development
 spec:
-  ports:
-  - port: 3306
+  type: ClusterIP
   selector:
-    app: mysql-auth
+    name: mysql-auth-pod
+    app: payments
+  ports:
+    - port: 3306
+      targetPort: 3306

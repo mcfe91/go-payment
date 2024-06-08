@@ -3,38 +3,43 @@ kind: Deployment
 metadata:
   name: mysql-ledger
   labels:
-    app: mysql-ledger
+    name: mysql-ledger
+    app: payments
+  namespace: development
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysql-ledger
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+      name: mysql-ledger-pod
+      app: payments
   template:
     metadata:
+      name: mysql-ledger-pod
       labels:
-        app: mysql-ledger
+        name: mysql-ledger-pod
+        app: payments
     spec:
       containers:
         - name: mysql-ledger
-          image: mysql:latest
-          envFrom:
-            - configMapRef:
-                name: mysql-ledger-configmap
-            - secretRef:
-                name: mysql-ledger-secret
+          image: mysql:8.0.32
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-ledger-secret
+                  key: root-password
           volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d/init.sql
-              name: init-sql
-              readOnly: true
-          securityContext:
-            privileged: true
+            - name: mysql-ledger-initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mysql-ledger-data
+              mountPath: "/var/lib/mysql"
+              subPath: "mysql"
       volumes:
-        - name: init-sql
-          hostPath:
-            path: /go-micro/ledger/init.sql
-            type: File
+        - name: mysql-ledger-initdb
+          configMap:
+            name: mysql-ledger-preload-data-config
+        - name: mysql-ledger-data
+          persistentVolumeClaim:
+            claimName: mysql-ledger-data-store

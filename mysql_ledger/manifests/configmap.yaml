@@ -1,6 +1,22 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-ledger-configmap
+  name: mysql-ledger-preload-data-config
+  labels:
+    name: mysql-ledger-data-store
+    app: payments
+  namespace: development
 data:
-  PLACEHOLDER: "NONE"
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS`ledger`;
+    USE `ledger`;
+    DROP TABLE IF EXISTS `ledger`;
+    CREATE TABLE `ledger`(
+     `id`int NOT NULL AUTO_INCREMENT,
+     `order_id`varchar(255) NOT NULL,
+     `user_id`varchar(255) NOT NULL,
+     `amount`INT NOT NULL,
+     `operation`varchar(255) NOT NULL,
+     `transaction_date`varchar(255) NOT NULL,
+      PRIMARY KEY (`id`)
+    );

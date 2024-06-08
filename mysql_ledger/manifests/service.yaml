@@ -1,12 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-ledger
+  name: mysql-ledger-service
+  labels:
+    name: mysql-ledger-service
+    app: payments
+  namespace: development
 spec:
   type: ClusterIP
   selector:
-    app: mysql-ledger
+    name: mysql-ledger-pod
+    app: payments
   ports:
     - port: 3306
       targetPort: 3306
-      protocol: TCP
