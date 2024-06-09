@@ -5,7 +5,7 @@ metadata:
   labels:
     app: ledger
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ledger
@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: ledger
-          image: mmcferren/ledger
+          image: mmcferren/ledger:v3
           envFrom:
             - configMapRef:
                 name: ledger-configmap

@@ -3,9 +3,11 @@ kind: Deployment
 metadata:
   name: money-movement
   labels:
+    name: money-movement
     app: money-movement
+  namespace: development
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: money-movement
@@ -20,7 +22,8 @@ spec:
     spec:
       containers:
         - name: money-movement
-          image: mmcferren/money-movement
+          image: mmcferren/money-movement:v2
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: money-movement-configmap

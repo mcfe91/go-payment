@@ -22,3 +22,6 @@
 # access mysql database
 # kubectl port-forward -n kafka mysql-money-movement-7597c855cc-s2psx 3306:3306
 # mysql -u root -h 127.0.0.1 -p (make sure local mysql service is stopped)
+
+# fix issue with GKE arch and docker build
+# docker buildx build --tag mmcferren/money-movement:latest ./ --platform linux/amd64

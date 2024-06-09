@@ -7,28 +7,28 @@ import (
 	"net"
 
 	// "github.com/mmcferren/go-micro/internal/implementation/auth"
+	_ "github.com/go-sql-driver/mysql"
 	mm "github.com/mmcferren/go-micro/internal/implementation"
 	pb "github.com/mmcferren/go-micro/proto"
 	"google.golang.org/grpc"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
 	dbDriver = "mysql"
-	dbUser = "money_movement_user"
+	dbUser   = "root"
 	// TODO: use k8s secrets
-	dbPassword = "Auth123"
-	dbName = "money_movement"
+	dbPassword = "winter"
+	dbName     = "money_movement"
 )
 
-var db * sql.DB
+var db *sql.DB
 
 func main() {
 	var err error
 
 	// Open a database connection
 	dsn := fmt.Sprintf("%s:%s@tcp(mysql-money-movement:3306)/%s", dbUser, dbPassword, dbName)
-	
+
 	db, err = sql.Open(dbDriver, dsn)
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +56,7 @@ func main() {
 		log.Fatalf("failed to listen on port 9000: %v", err)
 	}
 
-	log.Printf("server listening at %v", listener.Addr())	
+	log.Printf("server listening at %v", listener.Addr())
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-auth-service
+  name: mysql-auth
   labels:
-    name: mysql-auth-service
+    name: mysql-auth
     app: payments
   namespace: development
 spec:

@@ -9,14 +9,14 @@ import (
 	"sync"
 
 	"github.com/IBM/sarama"
-	"github.com/mmcferren/go-micro/internal/ledger"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mmcferren/go-micro/internal/ledger"
 )
 
 const (
 	dbDriver = "mysql"
-	dbName = "ledger"
-	topic = "ledger"
+	dbName   = "ledger"
+	topic    = "ledger"
 )
 
 var (
@@ -25,11 +25,11 @@ var (
 )
 
 type LedgerMsg struct {
-	OrderID string `json:"order_id"`
-	UserID string `json:"user_id"`
-	Amount int64`json:"amount"`
+	OrderID   string `json:"order_id"`
+	UserID    string `json:"user_id"`
+	Amount    int64  `json:"amount"`
 	Operation string `json:"operation"`
-	Date string `json:"date"`
+	Date      string `json:"date"`
 }
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 
 	// Open a database connection
 	dsn := fmt.Sprintf("%s:%s@tcp(mysql-ledger:3306)/%s", dbUser, dbPassword, dbName)
-	
+
 	db, err = sql.Open(dbDriver, dsn)
 	if err != nil {
 		log.Fatal(err)
@@ -59,7 +59,7 @@ func main() {
 	}
 
 	done := make(chan struct{})
-	
+
 	sarama.Logger = log.New(os.Stdout, "[sarama]", log.LstdFlags)
 
 	consumer, err := sarama.NewConsumer([]string{"kafka-service:9092"}, sarama.NewConfig())
