@@ -2,6 +2,8 @@
 
 # TODO:
 - ~~Update manifests - initdb in configmap for GKE / remove unneeded PV.~~
+- ~~Multi-arch docker images~~
+- ~~Move db init scripts to configmap/volumeMount~~
 - Move infra to separate repo
 - Move credentials to secrets provider
 - Add Redis caching
