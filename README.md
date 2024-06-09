@@ -6,6 +6,6 @@
 - Build ledger dashboard FE
 - Migrate DBs to cloud storage solution
 - Add monitoring (Prometheus/Grafana)
-- Deploy to cloud provider (AWS/GCP)
+- ~~Deploy to cloud provider (AWS/GCP)~~
 - Setup CI/CD for infra/service deployment
 - Migrate manifests to Terraform
