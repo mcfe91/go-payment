@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: mmcferren/gateway:v2
+          image: ${IMAGE}
           envFrom:
             - configMapRef:
                 name: gateway-configmap
