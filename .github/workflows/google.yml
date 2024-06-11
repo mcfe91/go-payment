@@ -1,0 +1,79 @@
+name: Build and Deploy to GKE
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: payments-cluster-1    # Add your cluster name here.
+  GKE_ZONE: us-central1-c   # Add your cluster zone here.
+  DEPLOYMENT_NAME: payments-gateway-deployment # Add your deployment name here.
+  IMAGE: gateway
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@1bee7de035d65ec5da40a31f8589e240eba8fde5
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - uses: google-github-actions/get-gke-credentials@db150f2cc60d1716e61922b832eae71d2a45938f
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+    
+    # Login to Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+  
+    # Build the Docker image
+    - name: Build
+      run: |-
+        docker build \
+          --tag "hub.docker.com/repositories/mmcferren/$IMAGE:$GITHUB_SHA" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+    
+    # Push the Docker image to Docker Hub Registry
+    - name: Publish
+      run: |-
+        docker push "hub.docker.com/repositories/mmcferren/$IMAGE:$GITHUB_SHA"
+
+    # Update gateway deploy manifest image token
+    - name: Replace image in manifests
+      uses: cschleiden/replace-tokens@v1
+      with:
+        files: |
+          /api-gateway/manifest/gateway-deploy.yaml
+      env:
+        IMAGE: hub.docker.com/repositories/mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
+
+    # Apply all manifests
+    - name: Apply Manifests
+      run: |
+        kubectl apply -f /api-gateway/manifest/.
+        kubectl rollout status deployment/${{ secrets.DEPLOYMENT_NAME }}
+        kubectl get services -o wide
+
