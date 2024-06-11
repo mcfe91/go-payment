@@ -78,7 +78,7 @@ jobs:
           --tag "mmcferren/$IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
-          .
+          ./api_gateway/
     
     # Push the Docker image to Docker Hub Registry
     - name: Publish
