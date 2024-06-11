@@ -89,8 +89,9 @@ jobs:
     - name: Replace image in manifests
       uses: cschleiden/replace-tokens@v1
       with:
-        files: |
-          api_gateway/manifests/gateway-deploy.yaml
+        tokenPrefix: '#{'
+        tokenSuffix: '}#'
+        files: '["**/gateway-deploy.yaml"]'
       env:
         IMAGE: mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
 
