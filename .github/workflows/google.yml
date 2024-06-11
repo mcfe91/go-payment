@@ -90,9 +90,9 @@ jobs:
       uses: cschleiden/replace-tokens@v1
       with:
         files: |
-          /api_gateway/manifests/gateway-deploy.yaml
+          api_gateway/manifests/gateway-deploy.yaml
       env:
-        IMAGE: hub.docker.com/repositories/mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
+        IMAGE: mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
 
     # Apply all manifests
     - name: Apply Manifests
