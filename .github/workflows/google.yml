@@ -97,7 +97,7 @@ jobs:
     # Apply all manifests
     - name: Apply Manifests
       run: |
-        kubectl apply -f /api-gateways/manifest/.
+        kubectl apply -f /api-gateway/manifests/.
         kubectl rollout status deployment/${{ secrets.DEPLOYMENT_NAME }}
         kubectl get services -o wide
 
