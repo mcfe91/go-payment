@@ -93,7 +93,7 @@ jobs:
         tokenSuffix: '}#'
         files: '["**/*.yaml"]'
       env:
-        IMAGE: "mmcferren/$IMAGE:$GITHUB_SHA"
+        IMAGE: mmcferren/${{ env.IMAGE }}:${{ github.sha }}
 
     # Apply all manifests
     - name: Apply Manifests
