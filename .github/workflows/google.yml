@@ -93,12 +93,15 @@ jobs:
         tokenSuffix: '}#'
         files: '["**/*.yaml"]'
       env:
-        IMAGE: mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
+        IMAGE: mmcferren/${{ IMAGE }}:${{ github.sha }}
 
     # Apply all manifests
     - name: Apply Manifests
       run: |
-        kubectl apply -f api_gateway/manifests/
+        kubectl apply -f api_gateway/manifests/configmap.yaml
+        kubectl apply -f api_gateway/manifests/secret.yaml
+        kubectl apply -f api_gateway/manifests/service.yaml
+        kubectl apply -f api_gateway/manifests/gateway-deploy.yaml
         kubectl rollout status deployment/${{ secrets.DEPLOYMENT_NAME }}
         kubectl get services -o wide
 
