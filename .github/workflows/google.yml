@@ -91,7 +91,7 @@ jobs:
       with:
         tokenPrefix: '#{'
         tokenSuffix: '}#'
-        files: 'api_gateway/manifests/gateway-deploy.yaml'
+        files: '["**/*.yaml"]'
       env:
         IMAGE: mmcferren/${{ secrets.IMAGE }}:${{ github.sha }}
 
